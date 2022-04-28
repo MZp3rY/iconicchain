@@ -1,4 +1,4 @@
-$lightGreen: #c9ffd7;
+$lightGreen: #b6d3bd;
 $lightBg: #fff;
 
 body {
@@ -49,6 +49,18 @@ body {
       h1 {
         text-align: center;
       }
+
+      .repoList {
+       th {
+          vertical-align: middle;
+        }
+        td,th {
+          &:last-child {
+            text-align: right;
+          }
+        }
+      }
+
     }
   }
 

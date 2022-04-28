@@ -9,6 +9,8 @@ $(document).ready(function(){
     else {
         $('.section-signin').addClass('d-none');
         $('main').removeClass('d-none');
+        $('div.repoList').find('tbody').html('');
+        listRepositories();
     }
     $('.loading').addClass('d-none');
 
@@ -22,7 +24,7 @@ $(document).ready(function(){
             if(!$(this).val().length) {
                 $(this).addClass('alert-danger');
             }
-        })
+        });
 
     $('.form-signin').submit(function(e){
         e.preventDefault();
@@ -54,6 +56,24 @@ $(document).ready(function(){
         location.reload();
     });
 
+    $('.repoList')
+        .on('click', 'a.view', function(){
+            console.log('View ' + $(this).closest('tr').attr('class').substring(3));
+        })
+        .on('click', 'a.edit', function(){
+            console.log('Edit ' + $(this).closest('tr').attr('class').substring(3));
+        })
+        .on('click', 'a.delete', function(){
+            console.log('Delete ' + $(this).closest('tr').attr('class').substring(3));
+        })
+        .on('click', 'a.add', function(){
+            console.log('Add new');
+            $('#addModal').modal('show');
+        });
+
+    $('.addNewRepo').on('click', function(){
+
+    });
 });
 
 /**
@@ -129,6 +149,7 @@ function loginSuccess(org = '',token = '')
     }
 
     $('.section-signin, main').toggleClass('d-none');
+    listRepositories();
 }
 
 /**
@@ -145,4 +166,52 @@ function randomRepositoryName(length) {
             charactersLength));
     }
     return result;
+}
+
+function listRepositories()
+{
+    $('.feedback.alert-danger').removeClass('alert alert-danger');
+    $('.loading').removeClass('d-none');
+
+    $.ajaxSetup( {
+        headers: {
+            accept: 'application/vnd.github.v3+json',
+            authorization: 'token ' + localStorage.getItem('token'),
+        },
+    });
+
+    $.ajax({
+        url: apiURL + '/orgs/' + localStorage.getItem('org') + '/repos',
+        method: 'get',
+        dataType: "json",
+    })
+        .done(function (response) {
+            $('.loading').addClass('d-none');
+            $('.repoList.d-none').removeClass('d-none');
+            console.log('Repositiories has been listed');
+
+            $.each(response, function(i,v){
+                addRowToList(i,v)
+            });
+        })
+        .fail(function() {
+            $('.loading').addClass('d-none');
+            $('.feedback')
+                .html('Error while listing repositories')
+                .addClass('alert alert-danger');
+        })
+}
+
+function addRowToList(i,v)
+{
+    $('.repoList > table > tbody').append('<tr class="n__' + v.name + '">' +
+        '<td class="text-center">' + (i+1) + '</td>' +
+        '<td>' + v.name + '</td>' +
+        '<td>' + v.node_id + '</td>' +
+        '<td>' + v.owner.login + '</td>' +
+        '<td class="text-center">' + v.visibility+ '</td>' +
+        '<td><a href="#" title="View repository" class="view btn btn-lg btn-outline-success"><i class="bi bi-eye"></i></a> ' +
+        '<a href="#" title="Edit repository" class="edit btn btn-lg btn-outline-warning"><i class="bi bi-pencil-square"></i></a> ' +
+        '<a href="#" title="Delete repository" class="delete btn btn-lg btn-outline-danger"><i class="bi bi-trash"></i></a></td>' +
+        '</tr>');
 }

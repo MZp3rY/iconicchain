@@ -2,7 +2,7 @@ body {
   height: 100vh;
   display: flex;
   align-items: center;
-  background-color: #c9ffd7; }
+  background-color: #b6d3bd; }
   body .section-signin {
     position: fixed;
     height: 100vh;
@@ -33,6 +33,10 @@ body {
       background: #fff; }
       body main > div h1 {
         text-align: center; }
+      body main > div .repoList th {
+        vertical-align: middle; }
+      body main > div .repoList td:last-child, body main > div .repoList th:last-child {
+        text-align: right; }
   body .loading {
     position: fixed;
     height: 100vh;
