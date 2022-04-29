@@ -77,7 +77,7 @@
           </table>
         </div>
 
-        <!-- Modal -->
+        <!-- addModal -->
         <div class="modal fade" id="addModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
              aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog">
@@ -88,11 +88,50 @@
               </div>
               <div class="modal-body">
                 <label for="newReposName">Name</label>
-                <input type="text" class="form-control" id="newReposName" placeholder="New Repositorys Name">
+                <input type="text" class="form-control my-3" id="newReposName" placeholder="New Repositorys Name">
+                <span class="text-danger small">Please use only alphanumeric characters, the wrong chars will be replaced.</span>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary addNewRepo">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- viewModal -->
+        <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Repository details: <span class="text-success"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning editRepo">Edit</button>
+                <button type="button" class="btn btn-danger deleteRepo">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- deleteModal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Delete repository</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure to delete this repository: <span class="repoName"></span>?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger deleteRepo">Delete</button>
               </div>
             </div>
           </div>

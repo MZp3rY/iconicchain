@@ -59,20 +59,136 @@ $(document).ready(function(){
     $('.repoList')
         .on('click', 'a.view', function(){
             console.log('View ' + $(this).closest('tr').attr('class').substring(3));
+
+            $('.feedback.alert-danger').removeClass('alert alert-danger');
+            $('.loading').removeClass('d-none');
+
+            $.ajaxSetup( {
+                headers: {
+                    accept: 'application/vnd.github.v3+json',
+                    authorization: 'token ' + localStorage.getItem('token'),
+                },
+            });
+
+            $.ajax({
+                url: apiURL + '/repos/' + localStorage.getItem('org') + '/' + $(this).closest('tr').attr('class').substring(3),
+                method: 'get',
+                dataType: "json",
+            })
+                .done(function (response) {
+                    $('.loading').addClass('d-none');
+
+                    let html = '<ul class="list-unstyled">';
+                    $.each(response, function(key,value){
+
+                        if(typeof value === 'object' && value !== null) {
+                            html += '<li class="object"><strong class="text-primary">' + key + '</strong>' +
+                                '<ul class="list-unstyled d-none">';
+
+                            $.each(value, function(key2,value2){
+                                if(typeof value2 === 'object' && value2 !== null) {
+                                    html += '<li class="object"><strong class="text-primary">' + key2 + '</strong>' +
+                                        '<ul class="list-unstyled d-none">';
+                                    $.each(value2, function(key3,value3){
+                                        html += addListElement(key3, value3);
+                                    });
+                                    html += '</ul></li>';
+
+                                }
+                                else{
+                                    html += addListElement(key2,value2);
+                                }
+                            });
+                            html += '</ul></li>';
+
+                        }
+                        else{
+                            html += addListElement(key,value);
+                        }
+                    });
+                    html += '</ul>';
+
+                    let $viewModal = $('#viewModal');
+                    $viewModal.find('h5.modal-title span').html(response.name);
+                    $viewModal.find('button.editRepo').data('reponame',response.name);
+                    $viewModal.find('button.deleteRepo').data('reponame',response.name);
+                    $viewModal.find('.modal-body').html(html);
+                    $viewModal.modal('show');
+                })
+                .fail(function() {
+                    $('.loading').addClass('d-none');
+                    $('.feedback')
+                        .html('Error while view repository')
+                        .addClass('alert alert-danger');
+                })
         })
         .on('click', 'a.edit', function(){
-            console.log('Edit ' + $(this).closest('tr').attr('class').substring(3));
+            editRepo( $(this).closest('tr').attr('class').substring(3));
         })
         .on('click', 'a.delete', function(){
-            console.log('Delete ' + $(this).closest('tr').attr('class').substring(3));
+            deleteRepoConfirm( $(this).closest('tr').attr('class').substring(3));
         })
         .on('click', 'a.add', function(){
             console.log('Add new');
             $('#addModal').modal('show');
         });
 
-    $('.addNewRepo').on('click', function(){
+    $('#viewModal').on('click', 'li.object', function(e){
+        e.stopPropagation();
+        $(this).find('>ul').toggleClass('d-none');
+    });
 
+    $('.addNewRepo').on('click', function(){
+        $('.feedback.alert-danger').removeClass('alert alert-danger');
+        $('.loading').removeClass('d-none');
+
+        let $newReposName = $('#newReposName');
+
+        if(!$newReposName.val().length) {
+            return false;
+        }
+
+        $.ajaxSetup( {
+            headers: {
+                accept: 'application/vnd.github.v3+json',
+                authorization: 'token ' + localStorage.getItem('token'),
+            },
+        });
+
+        $.ajax({
+            url: apiURL + '/orgs/' + localStorage.getItem('org') + '/repos',
+            method: 'post',
+            dataType: "json",
+            data: '{"name":"' + $newReposName.val().trim() + '"}'
+        })
+            .done(function (response) {
+                $('.loading').addClass('d-none');
+                console.log('New repo:');
+                $('#addModal')
+                    .modal('hide')
+                    .find('input').val('');
+
+                addRowToList($('.repoList').find('tbody tr').length,response)
+            })
+            .fail(function() {
+                $('.loading').addClass('d-none');
+                $('.feedback')
+                    .html('Error while adding repository')
+                    .addClass('alert alert-danger');
+            })
+
+    });
+
+    $('.editRepo').on('click', function(){
+        editRepo($(this).data('reponame'));
+    });
+
+    $('#viewModal .deleteRepo').on('click', function() {
+        deleteRepoConfirm($(this).data('reponame'));
+    });
+
+    $('#deleteModal .deleteRepo').on('click', function() {
+        deleteRepo($(this).data('reponame'));
     });
 });
 
@@ -168,6 +284,9 @@ function randomRepositoryName(length) {
     return result;
 }
 
+/**
+ * Get the repositories from organization
+ */
 function listRepositories()
 {
     $('.feedback.alert-danger').removeClass('alert alert-danger');
@@ -188,11 +307,11 @@ function listRepositories()
         .done(function (response) {
             $('.loading').addClass('d-none');
             $('.repoList.d-none').removeClass('d-none');
-            console.log('Repositiories has been listed');
 
             $.each(response, function(i,v){
                 addRowToList(i,v)
             });
+            console.log('Repositories has been listed');
         })
         .fail(function() {
             $('.loading').addClass('d-none');
@@ -202,6 +321,11 @@ function listRepositories()
         })
 }
 
+/**
+ * Add a new row to list of repository after create that
+ * @param {string} i
+ * @param {string} v
+ */
 function addRowToList(i,v)
 {
     $('.repoList > table > tbody').append('<tr class="n__' + v.name + '">' +
@@ -214,4 +338,91 @@ function addRowToList(i,v)
         '<a href="#" title="Edit repository" class="edit btn btn-lg btn-outline-warning"><i class="bi bi-pencil-square"></i></a> ' +
         '<a href="#" title="Delete repository" class="delete btn btn-lg btn-outline-danger"><i class="bi bi-trash"></i></a></td>' +
         '</tr>');
+}
+
+/**
+ * Open delete confirm modal
+ * @param {string} repoName
+ */
+function deleteRepoConfirm(repoName)
+{
+    console.log('Delete confirm ' + repoName);
+    $('#viewModal').modal('hide');
+    let $deleteModal = $('#deleteModal');
+    $deleteModal.find('.repoName').html(repoName);
+    $deleteModal.find('button.deleteRepo').data('reponame',repoName);
+    $deleteModal.modal('show');
+}
+
+function editRepo(repoName)
+{
+    console.log('Edit ' + repoName);
+}
+
+/**
+ * Create a LI html element with key and value parameter (and a little prettify :) )
+ * @param {string} key
+ * @param {string} value
+ * @returns {string}
+ */
+function addListElement(key, value)
+{
+    let html = '<li><strong>' + key + ':</strong> ';
+
+    if(value === null)
+        html += '<i>null</i>'
+    else
+        html += (value.toString().substring(0,8) === "https://"
+                    ? '<a href="' + value + '">'
+                        + (value.toString().substring(0,apiURL.length) === apiURL
+                            ? '<i class="bi-github"></i>' + value.substring(apiURL.length)
+                            : value)
+                        + '</a>'
+                    : value);
+
+    html +=  '</li>';
+    return html;
+}
+
+/**
+ * Deleting the selected repository
+ * @param repoName
+ */
+function deleteRepo(repoName)
+{
+    $('#deleteModal').modal('hide');
+    if(repoName.length) {
+        $('.feedback.alert-danger').removeClass('alert alert-danger');
+        $('.loading').removeClass('d-none');
+
+        $.ajaxSetup( {
+            headers: {
+                accept: 'application/vnd.github.v3+json',
+                authorization: 'token ' + localStorage.getItem('token'),
+            },
+        });
+
+        $.ajax({
+            url: apiURL + '/repos/' + localStorage.getItem('org') + '/' + repoName,
+            method: 'delete',
+            dataType: "json",
+        })
+            .done(function () {
+                $('.loading').addClass('d-none');
+                let $repoListTable = $('.repoList table');
+                $repoListTable.find('.n__' + repoName).remove();
+                $repoListTable.find('tr').each(function(i) {
+                    $(this).find('td:first-child').html(i);
+                });
+                console.log('Repository (' + repoName + ') has been deleted');
+            })
+            .fail(function() {
+                $('.loading').addClass('d-none');
+                $('.feedback')
+                    .html('Error while deleting repository')
+                    .addClass('alert alert-danger');
+            })
+
+    }
+
 }

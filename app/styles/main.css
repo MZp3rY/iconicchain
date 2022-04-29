@@ -36,14 +36,26 @@ body {
       body main > div .repoList th {
         vertical-align: middle; }
       body main > div .repoList td:last-child, body main > div .repoList th:last-child {
-        text-align: right; }
+        text-align: right;
+        white-space: nowrap; }
+      body main > div .repoList td table, body main > div .repoList th table {
+        width: 100%; }
+        body main > div .repoList td table tbody, body main > div .repoList th table tbody {
+          display: block;
+          max-height: 160px;
+          overflow-y: scroll; }
+        body main > div .repoList td table thead, body main > div .repoList td table tbody tr, body main > div .repoList th table thead, body main > div .repoList th table tbody tr {
+          display: table;
+          width: 100%;
+          table-layout: fixed; }
   body .loading {
     position: fixed;
     height: 100vh;
     background: #000000dd;
     width: 100%;
     display: flex;
-    align-items: center; }
+    align-items: center;
+    z-index: 99999; }
     body .loading .lds-hourglass {
       display: inline-block;
       position: relative;
@@ -71,5 +83,9 @@ body {
     animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1); }
   100% {
     transform: rotate(1800deg); } }
+  body #viewModal ul li.object {
+    cursor: pointer; }
+  body #viewModal ul ul {
+    margin: 0 30px; }
 
 /*# sourceMappingURL=main.css.map */

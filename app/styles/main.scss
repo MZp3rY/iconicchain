@@ -43,6 +43,7 @@ body {
     width: 100%;
 
     &>div {
+
       padding: 30px;
       background: $lightBg;
 
@@ -51,12 +52,28 @@ body {
       }
 
       .repoList {
-       th {
+        th {
           vertical-align: middle;
         }
         td,th {
           &:last-child {
             text-align: right;
+            white-space: nowrap;
+          }
+          table {
+            width:100%;
+
+            tbody {
+              display:block;
+              max-height:160px;
+              overflow-y:scroll;
+            }
+
+            thead, tbody tr {
+              display:table;
+              width:100%;
+              table-layout:fixed;
+            }
           }
         }
       }
@@ -71,6 +88,7 @@ body {
     width: 100%;
     display: flex;
     align-items: center;
+    z-index: 99999;
 
     .lds-hourglass {
       display: inline-block;
@@ -108,4 +126,16 @@ body {
 
   }
 
+  #viewModal {
+    ul {
+      li {
+        &.object {
+          cursor: pointer;
+        }
+      }
+      ul {
+        margin: 0 30px;
+      }
+    }
+  }
 }
