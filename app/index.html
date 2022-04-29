@@ -33,7 +33,7 @@
   <main class="d-none">
     <div class="container">
 
-      <a class="logout btn btn-lg" href="javascript:void(0)" title="Logout" data-bs-toggle="title">
+      <a class="logout btn btn-lg float-end" href="javascript:void(0)" title="Logout" data-bs-toggle="title">
         <i class="bi bi-x-square-fill"></i> Logout</a>
 
       <!-- Modal -->
@@ -112,6 +112,32 @@
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-warning editRepo">Edit</button>
+                <button type="button" class="btn btn-danger deleteRepo">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- editModal -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Edit repository: <span class="text-success"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <div class="table-responsive editTable">
+                  <form class="editForm">
+                  <table class="table">
+                    <tbody></tbody>
+                  </table>
+                  </form>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning updateRepo">Save</button>
                 <button type="button" class="btn btn-danger deleteRepo">Delete</button>
               </div>
             </div>
